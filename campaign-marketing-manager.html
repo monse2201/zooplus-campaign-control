@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campaign Control — Monserrat Álvarez</title>
+<style>
+  :root{
+    --cream:#FAFAF6;
+    --ink:#14201A;
+    --ink-soft:#5B6259;
+    --green:#0B5D34;
+    --green-soft:#2F7A4E;
+    --green-bright:#1C8C4E;
+    --green-tint:#EAF3EC;
+    --orange:#E2672B;
+    --orange-deep:#C1551F;
+    --lavender:#C9C2E8;
+    --lavender-soft:#EFEBFA;
+    --line:#E2E1D8;
+    --white:#FFFFFF;
+    --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--cream); color:var(--ink); font-family:var(--sans); line-height:1.5; -webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--lavender); color:var(--ink);}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 32px;}
+  section{padding:120px 0;}
+  section.tight{padding:96px 0;}
+  section.tint{background:var(--green-tint);}
+  h1,h2,h3,h4{font-weight:600; letter-spacing:-0.02em; line-height:1.08;}
+  h2{font-size:clamp(28px,3.6vw,44px); font-weight:600; max-width:780px;}
+  p.lede{font-size:19px; color:var(--ink-soft); max-width:640px; line-height:1.6;}
+
+  .kicker{font-size:13px; color:var(--green); font-weight:600; display:flex; align-items:center; gap:10px; margin-bottom:18px;}
+  .kicker::before{content:''; width:22px; height:1px; background:var(--green); display:inline-block;}
+  .role-tag{display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--green-soft); background:var(--white); border:1px solid var(--line); padding:6px 12px; border-radius:100px; margin-top:28px;}
+  .role-tag::before{content:'●'; color:var(--orange); font-size:8px;}
+  .verified-tag{display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:#fff; background:var(--green); padding:6px 14px; border-radius:100px;}
+  .verified-tag::before{content:'✓'; font-weight:700;}
+  .illustrative-tag{font-family:var(--mono); font-size:10.5px; letter-spacing:0.05em; color:var(--ink-soft); background:var(--cream); border:1px dashed var(--line); padding:4px 10px; border-radius:100px; display:inline-block; margin-bottom:16px;}
+  .disclaimer{display:flex; gap:14px; background:var(--lavender-soft); border:1px solid #D9D2F0; border-radius:10px; padding:18px 22px; font-size:13.5px; color:#4A4468; margin:32px 0 8px;}
+  .disclaimer .mark{font-family:var(--mono); font-weight:700; color:#6C5FA8;}
+  .section-head{display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap;}
+
+  /* UTILITY + NAV */
+  .utility-bar{background:var(--ink); color:#C9C7BC; font-size:11.5px;}
+  .utility-inner{display:flex; justify-content:space-between; align-items:center; height:34px;}
+  @media (max-width:760px){ .utility-inner span:last-child{display:none;} }
+  header.nav{position:sticky; top:0; z-index:50; background:rgba(250,250,246,0.88); backdrop-filter:blur(10px); border-bottom:1px solid var(--line);}
+  .nav-inner{max-width:1180px; margin:0 auto; padding:0 32px; display:flex; align-items:center; justify-content:space-between; height:66px;}
+  .brand{font-weight:700; font-size:15px; letter-spacing:-0.01em; display:flex; align-items:center; gap:9px;}
+  .brand .mark{width:26px; height:26px; border-radius:50%; background:var(--green); display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .brand .mark svg{width:14px; height:14px;}
+  .brand span{color:var(--green);}
+  nav.links{display:flex; gap:26px; font-size:14px; color:var(--ink-soft);}
+  nav.links a:hover{color:var(--ink);}
+  .cta-btn{background:var(--ink); color:var(--cream); font-size:14px; padding:9px 18px; border-radius:100px; font-weight:500; white-space:nowrap;}
+  .cta-btn:hover{background:var(--green);}
+  @media (max-width:900px){ nav.links{display:none;} }
+
+  /* HERO */
+  .hero{padding:96px 0 80px; display:grid; grid-template-columns:1.1fr 0.9fr; gap:64px; align-items:center; position:relative; overflow:hidden;}
+  .hero::before{
+    content:''; position:absolute; inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='%230B5D34' fill-opacity='0.05'%3E%3Cpath d='M20 30h14l16-10v40l-16-10H20z'/%3E%3Cpath d='M100 90h14l16-10v40l-16-10h-14z'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat:repeat; pointer-events:none; z-index:0;
+  }
+  .hero-copy, .control-center{position:relative; z-index:1;}
+  @media (max-width:940px){ .hero{grid-template-columns:1fr;} }
+  .hero h1{font-size:clamp(36px,5vw,60px); margin-bottom:26px;}
+  .hero p.lede{margin-bottom:20px;}
+  .badges{display:flex; gap:10px; flex-wrap:wrap; margin-top:30px;}
+  .badge{font-family:var(--mono); font-size:11px; letter-spacing:0.02em; background:var(--white); border:1px solid var(--line); padding:7px 12px; border-radius:100px; color:var(--ink-soft);}
+
+  .control-center{background:var(--ink); color:var(--cream); border-radius:14px; padding:28px; overflow:hidden; box-shadow:0 16px 40px rgba(11,93,52,0.18);}
+  .control-center::before{content:''; position:absolute; top:-60px; right:-60px; width:200px; height:200px; background:radial-gradient(circle, rgba(28,140,78,0.4), transparent 70%);}
+  .cc-head{display:flex; justify-content:space-between; align-items:center; font-family:var(--mono); font-size:11px; color:#B9B7AC; margin-bottom:18px; letter-spacing:0.04em;}
+  .cc-head .dot{width:7px; height:7px; border-radius:50%; background:#5FBF7A; display:inline-block; margin-right:6px;}
+  .cc-row{display:flex; justify-content:space-between; align-items:baseline; padding:13px 0; border-bottom:1px solid rgba(255,255,255,0.09); font-size:14px;}
+  .cc-row:last-of-type{border-bottom:none;}
+  .cc-row .val{font-family:var(--mono); font-size:15px;}
+  .up{color:#7FD199;} .down{color:#E8896B;}
+  .cc-footer{margin-top:20px; padding-top:18px; border-top:1px dashed rgba(255,255,255,0.16); font-size:13px; color:#D8D6CC;}
+  .cc-footer strong{display:block; color:#fff; margin-bottom:4px; font-weight:600;}
+
+  /* QUICK NAV TILES */
+  .shop-row{padding:0 0 64px;}
+  .tiles{display:flex; justify-content:space-between; gap:8px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:28px 0;}
+  .tile{display:flex; flex-direction:column; align-items:center; gap:10px; font-size:12.5px; font-weight:500; color:var(--ink); flex:1; text-align:center;}
+  .tile-circle{width:56px; height:56px; border-radius:50%; background:var(--green-tint); color:var(--green); display:flex; align-items:center; justify-content:center; transition:background 0.2s ease, color 0.2s ease, transform 0.2s ease;}
+  .tile-circle svg{width:22px; height:22px;}
+  .tile:hover .tile-circle{background:var(--green); color:#fff; transform:translateY(-2px);}
+  .tile.current{color:var(--green);}
+  .tile.current .tile-circle{background:var(--green); color:#fff; box-shadow:0 0 0 4px var(--green-tint);}
+  @media (max-width:760px){ .tiles{flex-wrap:wrap;} .tile{flex:1 1 30%;} }
+
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:48px;}
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:48px;}
+  @media (max-width:860px){ .grid-3, .grid-2{grid-template-columns:1fr;} }
+  .card{background:var(--white); border:1px solid var(--line); border-radius:10px; padding:26px; box-shadow:0 1px 2px rgba(20,32,26,0.04); transition:box-shadow 0.2s ease, transform 0.2s ease;}
+  .card:hover{box-shadow:0 8px 20px rgba(20,32,26,0.07); transform:translateY(-2px);}
+  .card h4{font-size:16px; margin-bottom:10px;}
+  .card p{font-size:14.5px; color:var(--ink-soft); line-height:1.55;}
+
+  /* TOUCHPOINT FLOW */
+  .touchpoints{margin-top:44px; display:flex; align-items:center; flex-wrap:wrap; gap:0; justify-content:center;}
+  .touchpoints .step{font-family:var(--mono); font-size:13px; background:var(--white); border:1px solid var(--line); padding:14px 18px; border-radius:8px; text-align:center; min-width:110px; box-shadow:0 1px 2px rgba(20,32,26,0.04);}
+  .touchpoints .arrow{color:var(--orange-deep); font-size:18px; padding:0 8px;}
+
+  .pillars{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:32px;}
+  @media (max-width:860px){ .pillars{grid-template-columns:1fr;} }
+  .pillar{background:var(--white); border:1px solid var(--line); border-radius:10px; padding:22px; box-shadow:0 1px 2px rgba(20,32,26,0.04);}
+  .pillar .tag{font-family:var(--mono); font-size:10.5px; color:var(--green); margin-bottom:8px; letter-spacing:0.04em;}
+  .pillar h4{font-size:16px; margin-bottom:8px;}
+  .pillar p{font-size:13.5px; color:var(--ink-soft); line-height:1.5;}
+
+  /* MEDIA PLAN — channel mix */
+  .market-filters{display:flex; gap:10px; flex-wrap:wrap; margin-top:40px; margin-bottom:8px;}
+  .market-filters span{font-size:12.5px; border:1px solid var(--line); padding:7px 15px; border-radius:100px; color:var(--ink-soft); cursor:pointer; transition:all 0.15s ease;}
+  .market-filters span:hover{border-color:var(--green);}
+  .market-filters span.active{background:var(--ink); color:var(--cream); border-color:var(--ink);}
+  .channel-mix{margin-top:26px; background:var(--white); border:1px solid var(--line); border-radius:10px; padding:28px; box-shadow:0 2px 8px rgba(20,32,26,0.05);}
+  .channel-row{display:flex; align-items:center; gap:16px; padding:11px 0;}
+  .channel-name{width:130px; font-size:13.5px; flex-shrink:0;}
+  .channel-bar-track{flex:1; height:20px; background:var(--cream); border-radius:100px; overflow:hidden;}
+  .channel-bar-fill{height:100%; background:var(--green); border-radius:100px; transition:width 0.5s ease; width:0%;}
+  .channel-pct{width:44px; text-align:right; font-family:var(--mono); font-size:13px; color:var(--ink-soft);}
+
+  /* KPI GRID */
+  .kpi-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:36px;}
+  @media (max-width:860px){ .kpi-grid{grid-template-columns:repeat(2,1fr);} }
+  .kpi{background:var(--white); border:1px solid var(--line); border-radius:10px; padding:22px; box-shadow:0 1px 2px rgba(20,32,26,0.04);}
+  .kpi .label{font-size:12.5px; color:var(--ink-soft); margin-bottom:10px;}
+  .kpi .value{font-family:var(--mono); font-size:26px; font-weight:600;}
+  .kpi .trend{font-size:12.5px; margin-top:6px; font-family:var(--mono);}
+
+  /* TOOL */
+  .tool{margin-top:44px; background:var(--white); border:1px solid var(--line); border-radius:10px; padding:32px; box-shadow:0 2px 8px rgba(20,32,26,0.05);}
+  .tool-controls{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:20px;}
+  @media (max-width:760px){ .tool-controls{grid-template-columns:1fr;} }
+  .tool-controls label{display:block; font-size:12px; color:var(--ink-soft); margin-bottom:8px; font-family:var(--mono);}
+  .tool-controls select{width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:6px; font-size:14px; background:var(--cream); color:var(--ink); font-family:var(--sans);}
+  .tool-generate{background:var(--green); color:#fff; border:none; padding:12px 22px; border-radius:6px; font-size:14px; font-weight:600; cursor:pointer;}
+  .tool-generate:hover{background:var(--green-bright);}
+  .tool-output{margin-top:26px; border-top:1px solid var(--line); padding-top:24px; display:none;}
+  .tool-output.show{display:block;}
+  .tool-output .rec-title{font-size:19px; font-weight:600; margin-bottom:16px;}
+  .tool-output dl{display:grid; grid-template-columns:150px 1fr; row-gap:14px; font-size:14px;}
+  .tool-output dt{font-family:var(--mono); font-size:11px; color:var(--ink-soft); padding-top:2px;}
+  .tool-output dd{color:var(--ink-soft); line-height:1.5;}
+
+  /* REAL EVIDENCE */
+  .evidence{margin-top:36px; background:var(--white); border:1px solid var(--line); border-radius:12px; padding:34px; box-shadow:0 4px 16px rgba(20,32,26,0.06);}
+  .evidence-stats{display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin-top:26px;}
+  @media (max-width:760px){ .evidence-stats{grid-template-columns:1fr;} }
+  .evidence-stat{background:var(--green-tint); border-radius:10px; padding:20px;}
+  .evidence-num{font-family:var(--mono); font-size:28px; font-weight:600; color:var(--green);}
+  .evidence-label{font-size:13px; color:var(--ink-soft); margin-top:6px;}
+
+  /* WORKFLOW TIMELINE */
+  .timeline-track{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:48px;}
+  @media (max-width:860px){ .timeline-track{grid-template-columns:1fr;} }
+  .tl-phase{border-top:3px solid var(--orange); padding-top:20px;}
+  .tl-phase .days{font-family:var(--mono); font-size:12px; color:var(--orange-deep); margin-bottom:8px;}
+  .tl-phase h4{font-size:18px; margin-bottom:14px;}
+  .tl-phase ul{list-style:none; font-size:14px; color:var(--ink-soft); display:flex; flex-direction:column; gap:8px;}
+  .tl-phase li::before{content:'—'; margin-right:8px; color:var(--line);}
+
+  /* PROFILE */
+  .stack{margin-top:48px; display:flex; flex-direction:column; align-items:center; gap:0; max-width:440px; margin-left:auto; margin-right:auto;}
+  .stack-item{font-family:var(--mono); font-size:13.5px; background:var(--white); border:1px solid var(--line); padding:12px 20px; border-radius:8px; width:100%; text-align:center;}
+  .stack-plus{font-family:var(--mono); color:var(--orange-deep); padding:4px 0; font-size:13px;}
+  .stack-arrow{padding:8px 0; color:var(--line); font-size:18px;}
+  .stack-result{font-weight:600; background:var(--ink); color:var(--cream); border-radius:8px; padding:14px 20px; width:100%; text-align:center; font-size:15px;}
+  .proof-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin-top:44px;}
+  @media (max-width:860px){ .proof-grid{grid-template-columns:1fr;} }
+  .proof{background:var(--white); border:1px solid var(--line); border-radius:10px; padding:24px; box-shadow:0 1px 2px rgba(20,32,26,0.04);}
+  .proof .tag{font-family:var(--mono); font-size:11px; color:var(--orange-deep); margin-bottom:10px;}
+  .proof .big{font-size:22px; font-weight:600; margin-bottom:8px;}
+  .proof p{font-size:13.5px; color:var(--ink-soft);}
+
+  /* FINAL */
+  .final{background:var(--ink); color:var(--cream); text-align:center; padding:130px 0;}
+  .final h2{color:var(--cream); margin:0 auto 20px; max-width:640px;}
+  .final p{color:#C9C7BC; max-width:480px; margin:0 auto 34px; font-size:16px;}
+  .final .cta-btn{background:var(--orange); color:#fff; padding:14px 30px; font-size:15px;}
+  .final .cta-btn:hover{background:var(--orange-deep);}
+  footer.foot{padding:34px 0; font-size:12.5px; color:var(--ink-soft); display:flex; justify-content:space-between; border-top:1px solid var(--line);}
+  @media (max-width:600px){ footer.foot{flex-direction:column; gap:8px;} }
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <div class="wrap utility-inner">
+    <span>Independent case study · Not affiliated with or endorsed by zooplus SE</span>
+    <span>Built for the Senior Strategic Campaign Marketing Manager application · Munich</span>
+  </div>
+</div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-7-7 18-2-8-8-2z"/></svg></span>CAMPAIGN <span>CONTROL</span></div>
+    <nav class="links">
+      <a href="#case-study">Case Study</a>
+      <a href="#concept">Concept</a>
+      <a href="#media">Media Plan</a>
+      <a href="#scorecard">Scorecard</a>
+      <a href="#builder">Mechanic Builder</a>
+      <a href="#about">About</a>
+    </nav>
+    <a href="#talk" class="cta-btn">Let's talk →</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap" style="display:contents;">
+  <div class="hero-copy">
+    <div class="kicker">Independent Campaign Marketing case study</div>
+    <h1>What if I briefed zooplus's next Sales Activation Campaign?</h1>
+    <p class="lede">I wouldn't start with a slogan. I'd start with the mechanic and the media plan that make an idea actually land — across channels, across markets.</p>
+    <p class="lede">This is an independent case study on how I'd plan, brief and track a centrally-driven zooplus campaign — creative concept, media plan, agency coordination and a KPI scorecard.</p>
+    <div class="badges">
+      <span class="badge">CAMPAIGN STRATEGY</span>
+      <span class="badge">MEDIA PLANNING</span>
+      <span class="badge">BRAND IDENTITY</span>
+    </div>
+    <div class="role-tag">Independent analysis · Publicly available information · September 2026</div>
+  </div>
+
+  <div class="control-center">
+    <div class="cc-head"><span><span class="dot"></span>CAMPAIGN SCORECARD</span><span>LIVE VIEW</span></div>
+    <div class="cc-row"><span>Reach</span><span class="val up">4.2M</span></div>
+    <div class="cc-row"><span>App Installs</span><span class="val up">18.4K</span></div>
+    <div class="cc-row"><span>Conversion Rate</span><span class="val up">3.1%</span></div>
+    <div class="cc-row"><span>CPA</span><span class="val down">€6.80</span></div>
+    <div class="cc-footer"><strong>Flagged today:</strong>Agency asset pending approval, DE market</div>
+  </div>
+  </div>
+</section>
+
+<section class="shop-row">
+  <div class="wrap">
+    <div class="tiles">
+      <a href="#case-study" class="tile">
+        <span class="tile-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V6a2 2 0 0 1 2-2h11a1 1 0 0 1 1 1v13"/><path d="M6 22a2 2 0 0 1-2-2V6"/><path d="M6 22h13a1 1 0 0 0 1-1v-1a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4z"/></svg></span>
+        <span>Case Study</span>
+      </a>
+      <a href="#concept" class="tile">
+        <span class="tile-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span>
+        <span>Concept</span>
+      </a>
+      <a href="#media" class="tile">
+        <span class="tile-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></span>
+        <span>Media Plan</span>
+      </a>
+      <a href="#scorecard" class="tile">
+        <span class="tile-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-4"/></svg></span>
+        <span>Scorecard</span>
+      </a>
+      <a href="#builder" class="tile">
+        <span class="tile-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
+        <span>Mechanic Builder</span>
+      </a>
+      <a href="#about" class="tile">
+        <span class="tile-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
+        <span>About</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="case-study">
+  <div class="wrap">
+    <div class="kicker">The case study</div>
+    <h2>How I'd plan a centrally-driven campaign for zooplus.</h2>
+    <p class="lede" style="margin-top:16px;">At Tobipets, I architected the CRM and landing-page infrastructure for a national brand partnership campaign. This case study applies that same discipline — concept, media plan, tracking — to a zooplus <strong style="color:var(--ink);">Sales Activation Campaign</strong>, one of the five central campaign types this role owns.</p>
+
+    <div class="disclaimer">
+      <span class="mark">Disclaimer</span>
+      <span>This is an independent strategic exercise based on publicly available information and illustrative datasets. It does not use confidential zooplus data.</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h4>Why a Sales Activation Campaign?</h4>
+        <p>It's the campaign type closest to my real experience: a time-boxed push with a clear conversion goal, run across multiple channels and markets at once — exactly the shape of the Tobipets × McDonald's campaign I built.</p>
+      </div>
+      <div class="card">
+        <h4>The core problem</h4>
+        <p>A centrally-planned campaign only works if the creative concept, the media plan and the local market execution stay aligned — from the first brief to the post-campaign report. Losing that thread anywhere is where campaigns quietly underperform.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="concept" class="tint">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Creative concept &amp; brand identity</div>
+        <h2>"The Great Unlock" — a sales activation concept.</h2>
+      </div>
+      <div class="role-tag" style="margin-top:0;">ROLE ALIGNMENT → CREATIVE CONCEPTS + BRAND IDENTITY</div>
+    </div>
+    <span class="illustrative-tag" style="margin-top:20px;">ILLUSTRATIVE CONCEPT</span>
+    <p class="lede" style="margin-top:8px;">A curiosity-led activation: deals reveal progressively as customers explore the shop, tuned to each local market's tone.</p>
+
+    <div class="pillars">
+      <div class="pillar"><div class="tag">TARGET GROUP</div><h4>Lapsed &amp; occasional buyers</h4><p>Customers who've bought before but aren't on a repeat cadence — the group most responsive to a time-boxed nudge.</p></div>
+      <div class="pillar"><div class="tag">KEY MESSAGE</div><h4>"Good deals, found fast."</h4><p>Positions zooplus's scale and search as an advantage, not just a discount — sales-driven, but brand-consistent.</p></div>
+      <div class="pillar"><div class="tag">MECHANIC</div><h4>Unlock-as-you-browse</h4><p>Deals reveal progressively as customers explore categories — turns browsing into part of the activation, not just a banner.</p></div>
+    </div>
+
+    <div class="touchpoints">
+      <div class="step">APP PUSH</div><span class="arrow">→</span>
+      <div class="step">EMAIL / CRM</div><span class="arrow">→</span>
+      <div class="step">SOCIAL</div><span class="arrow">→</span>
+      <div class="step">IN-APP BANNER</div><span class="arrow">→</span>
+      <div class="step">LANDING PAGE</div>
+    </div>
+  </div>
+</section>
+
+<section id="media">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Media plan</div>
+        <h2>Channel mix, tuned per market.</h2>
+      </div>
+      <div class="role-tag" style="margin-top:0;">ROLE ALIGNMENT → MEDIA PLANS + BOOKABLE MARKETING PACKAGES</div>
+    </div>
+    <span class="illustrative-tag" style="margin-top:20px;">ILLUSTRATIVE DATA — click a market</span>
+
+    <div class="market-filters" id="market-filters">
+      <span class="active" data-market="de">Germany</span><span data-market="fr">France</span><span data-market="be">Belgium</span>
+    </div>
+
+    <div class="channel-mix" id="channel-mix"></div>
+
+    <p class="lede" style="margin-top:24px; font-size:15px;">Own Brand and supplier packages get bundled into the same plan, coordinated with Vendor Management so the campaign calendar and the commercial calendar don't compete for the same slots.</p>
+  </div>
+</section>
+
+<section id="scorecard" class="tint">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Marketing KPI scorecard</div>
+        <h2>What "working" looks like, mid-campaign.</h2>
+      </div>
+      <div class="role-tag" style="margin-top:0;">ROLE ALIGNMENT → MARKETING KPI SCORE CARD + PERFORMANCE ANALYSIS</div>
+    </div>
+    <span class="illustrative-tag" style="margin-top:20px;">ILLUSTRATIVE DATA</span>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Reach</div><div class="value">4.2M</div><div class="trend up">↑ 12% vs. plan</div></div>
+      <div class="kpi"><div class="label">App Installs</div><div class="value">18.4K</div><div class="trend up">↑ 6% vs. plan</div></div>
+      <div class="kpi"><div class="label">Conversion Rate</div><div class="value">3.1%</div><div class="trend up">↑ 0.4pp</div></div>
+      <div class="kpi"><div class="label">CPA</div><div class="value">€6.80</div><div class="trend down">↓ 8% vs. plan</div></div>
+      <div class="kpi"><div class="label">Campaign ROI</div><div class="value">3.4x</div><div class="trend up">↑ 0.3x</div></div>
+      <div class="kpi"><div class="label">Engagement Rate</div><div class="value">21.6%</div><div class="trend down">↓ 1.1pp</div></div>
+    </div>
+    <p class="lede" style="margin-top:24px; font-size:15px;"><strong style="color:var(--ink);">My take:</strong> installs and reach are ahead of plan, but engagement is soft — that's the driver I'd dig into with the channel owners before the next flight, not after the campaign closes.</p>
+  </div>
+</section>
+
+<section id="builder">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="kicker">Campaign Mechanic Builder</div>
+        <h2>A small tool, not a slide.</h2>
+      </div>
+      <div class="role-tag" style="margin-top:0;">ROLE ALIGNMENT → CAMPAIGN CONCEPTS + SALES MECHANICS PER CAMPAIGN TYPE</div>
+    </div>
+
+    <div class="tool">
+      <div class="tool-controls">
+        <div>
+          <label>Campaign type</label>
+          <select id="c-type">
+            <option value="activation">Sales Activation</option>
+            <option value="expertise">Pet Expertise</option>
+            <option value="app">App-Exclusive</option>
+            <option value="ob">Central Own Brand</option>
+          </select>
+        </div>
+        <div>
+          <label>Objective</label>
+          <select id="c-obj">
+            <option value="installs">Drive app installs</option>
+            <option value="basket">Increase basket during campaign</option>
+            <option value="awareness">Build category awareness</option>
+          </select>
+        </div>
+        <div>
+          <label>Market</label>
+          <select id="c-market">
+            <option>Germany</option>
+            <option>France</option>
+            <option>Belgium</option>
+          </select>
+        </div>
+      </div>
+      <button class="tool-generate" id="c-go">Generate concept</button>
+
+      <div class="tool-output" id="c-out">
+        <div class="rec-title" id="c-title">Concept #01</div>
+        <dl>
+          <dt>CREATIVE ANGLE</dt><dd id="c-angle"></dd>
+          <dt>LEAD MECHANIC</dt><dd id="c-mechanic"></dd>
+          <dt>PRIMARY CHANNELS</dt><dd id="c-channels"></dd>
+          <dt>PRIMARY KPI</dt><dd id="c-kpi"></dd>
+          <dt>RISK</dt><dd id="c-risk"></dd>
+          <dt>NEXT STEP</dt><dd id="c-next"></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tint">
+  <div class="wrap">
+    <div class="kicker">The one real campaign I've already run</div>
+    <h2>Tobipets × McDonald's — verified, not illustrative.</h2>
+    <span class="verified-tag" style="margin-top:16px;">VERIFIED — from my own CV, not a simulation</span>
+
+    <div class="evidence">
+      <p class="lede" style="font-size:16px;">As Marketing Analyst at Tobipets, I architected the CRM automation and landing-page infrastructure for a national brand partnership campaign with McDonald's — end to end, from lead capture to conversion tracking.</p>
+      <div class="evidence-stats">
+        <div class="evidence-stat"><div class="evidence-num">11,400+</div><div class="evidence-label">New leads captured</div></div>
+        <div class="evidence-stat"><div class="evidence-num">350+</div><div class="evidence-label">Conversions from those leads</div></div>
+      </div>
+      <p class="lede" style="margin-top:22px; font-size:15px;">What I'd bring from this to zooplus: I don't just brief a campaign concept — I know what has to be built and tracked behind it for the numbers to actually show up in a scorecard.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Agency &amp; stakeholder workflow</div>
+    <h2>How a concept becomes a live campaign.</h2>
+    <div class="role-tag" style="margin-top:0;">ROLE ALIGNMENT → AGENCY COLLABORATION + PRESENTING TO STAKEHOLDERS</div>
+
+    <div class="timeline-track">
+      <div class="tl-phase">
+        <div class="days">BEFORE LAUNCH</div>
+        <h4>Brief &amp; align</h4>
+        <ul>
+          <li>Concept &amp; mediaplan presented to Cluster leadership</li>
+          <li>Brief handed to external agency</li>
+          <li>Bookable packages confirmed with suppliers &amp; OB</li>
+        </ul>
+      </div>
+      <div class="tl-phase">
+        <div class="days">DURING</div>
+        <h4>Steer &amp; monitor</h4>
+        <ul>
+          <li>Agency asset review against brand identity</li>
+          <li>Mid-flight KPI scorecard check with channel owners</li>
+          <li>Local market tweaks where conditions differ</li>
+        </ul>
+      </div>
+      <div class="tl-phase">
+        <div class="days">AFTER</div>
+        <h4>Analyse &amp; document</h4>
+        <ul>
+          <li>Performance analysis vs. plan</li>
+          <li>Documentation for the next campaign concept</li>
+          <li>Findings presented up and across teams</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="tint">
+  <div class="wrap">
+    <div class="kicker">The profile</div>
+    <h2>Why me.</h2>
+
+    <div class="stack">
+      <div class="stack-item">MARKETING &amp; BRAND EXECUTION</div><div class="stack-plus">+</div>
+      <div class="stack-item">CRM &amp; LIFECYCLE AUTOMATION</div><div class="stack-plus">+</div>
+      <div class="stack-item">CROSS-FUNCTIONAL COORDINATION</div><div class="stack-plus">+</div>
+      <div class="stack-item">DATA-INFORMED OPTIMISATION</div><div class="stack-plus">+</div>
+      <div class="stack-item">INDUSTRIAL ENGINEERING</div>
+      <div class="stack-arrow">↓</div>
+      <div class="stack-result">CAMPAIGNS THAT SHIP AND GET MEASURED</div>
+    </div>
+
+    <div class="proof-grid">
+      <div class="proof"><div class="tag">CAMPAIGN</div><div class="big">National brand partnership</div><p>Architected CRM automation and landing-page infrastructure for the Tobipets × McDonald's campaign — 11,400+ leads, 350+ conversions.</p></div>
+      <div class="proof"><div class="tag">LIFECYCLE</div><div class="big">HubSpot automation</div><p>Engineered automated communication workflows and lifecycle marketing funnels in HubSpot to increase customer retention.</p></div>
+      <div class="proof"><div class="tag">CHANNEL MIX</div><div class="big">OOH, influencer, partnerships</div><p>Hands-on experience across OOH campaigns, influencer management, partnerships and event management — the same channel types this role plans against.</p></div>
+      <div class="proof"><div class="tag">TECH DEVELOPMENT</div><div class="big">I build the tools, not just brief them</div><p>Production integrations with the Claude and OpenAI APIs, and app-level product builds on Xano — directly relevant to "taking part in technical developments (app, targeting integration, tool development for campaign management)," a line most marketing candidates can't actually deliver on.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="final" id="talk">
+  <div class="wrap">
+    <h2>Your turn, zooplus.</h2>
+    <p>I've shown you how I'd brief this campaign. Now I'd love to see how your team briefs one.</p>
+    <a href="mailto:monsealva31221@gmail.com" class="cta-btn">Let's talk about Campaigns →</a>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap" style="display:flex; justify-content:space-between; width:100%;">
+    <span>Campaign Control — Monserrat Álvarez</span>
+    <span>Independent case study · Not affiliated with zooplus SE</span>
+  </div>
+</footer>
+
+<script>
+  // Quick-nav scrollspy
+  const navTiles = Array.from(document.querySelectorAll('.tile[href^="#"]'));
+  const tileTargets = navTiles.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const tileSpy = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      const tile = navTiles.find(a => a.getAttribute('href') === '#' + entry.target.id);
+      if(!tile) return;
+      if(entry.isIntersecting){
+        navTiles.forEach(t=>t.classList.remove('current'));
+        tile.classList.add('current');
+      }
+    });
+  }, {rootMargin:'-40% 0px -50% 0px', threshold:0});
+  tileTargets.forEach(t=>tileSpy.observe(t));
+
+  // Media plan — channel mix per market
+  const channelData = {
+    de: [
+      {name:'App Push', pct:26}, {name:'Email / CRM', pct:22}, {name:'Paid Social', pct:20},
+      {name:'Influencer', pct:14}, {name:'OOH', pct:10}, {name:'Affiliate', pct:8}
+    ],
+    fr: [
+      {name:'Paid Social', pct:28}, {name:'App Push', pct:20}, {name:'Influencer', pct:18},
+      {name:'Email / CRM', pct:16}, {name:'OOH', pct:12}, {name:'Affiliate', pct:6}
+    ],
+    be: [
+      {name:'Email / CRM', pct:24}, {name:'App Push', pct:22}, {name:'Paid Social', pct:20},
+      {name:'OOH', pct:16}, {name:'Influencer', pct:10}, {name:'Affiliate', pct:8}
+    ]
+  };
+
+  function renderChannelMix(market){
+    const el = document.getElementById('channel-mix');
+    el.innerHTML = channelData[market].map(c => `
+      <div class="channel-row">
+        <span class="channel-name">${c.name}</span>
+        <div class="channel-bar-track"><div class="channel-bar-fill" data-target="${c.pct}"></div></div>
+        <span class="channel-pct">${c.pct}%</span>
+      </div>
+    `).join('');
+    requestAnimationFrame(()=>{
+      document.querySelectorAll('.channel-bar-fill').forEach(bar=>{
+        bar.style.width = bar.getAttribute('data-target') + '%';
+      });
+    });
+  }
+
+  document.getElementById('market-filters').addEventListener('click', (e)=>{
+    const t = e.target.closest('[data-market]');
+    if(!t) return;
+    document.querySelectorAll('#market-filters [data-market]').forEach(el=>el.classList.remove('active'));
+    t.classList.add('active');
+    renderChannelMix(t.getAttribute('data-market'));
+  });
+
+  renderChannelMix('de');
+
+  // Campaign Mechanic Builder — rule-based
+  const concepts = {
+    'activation|installs': {
+      angle:'"Unlock the app, unlock the deal" — a limited-time offer only visible in-app.',
+      mechanic:'Progressive reveal: browsing categories unlocks deals, but only inside the app.',
+      channels:'App push, in-app banner, email retargeting for non-app users',
+      kpi:'App installs',
+      risk:'Customers without the app feel excluded — needs a light web fallback offer.',
+      next:'Brief the app team on the unlock logic before the media plan is finalised.'
+    },
+    'activation|basket': {
+      angle:'"Fill the bowl" — spend thresholds unlock bundled extras.',
+      mechanic:'Tiered spend thresholds (e.g. free treats at €40, free shipping at €60).',
+      channels:'Email/CRM, on-site banners, paid social retargeting',
+      kpi:'AOV during the campaign window',
+      risk:'Margin pressure if thresholds are set too low relative to average basket.',
+      next:'Model threshold levels against last quarter\u2019s basket data before locking mechanics.'
+    },
+    'expertise|awareness': {
+      angle:'"Ask a pet expert" — content-led campaign positioning zooplus as the knowledgeable choice.',
+      mechanic:'Short-form expert content series, gated behind a light email signup.',
+      channels:'Social, email/CRM, on-site content hub',
+      kpi:'Category page engagement rate',
+      risk:'Content-led campaigns are slower to show commercial impact — needs a longer measurement window.',
+      next:'Align with Product on a content hub landing page before briefing the agency.'
+    },
+    'ob|basket': {
+      angle:'"Meet the house brand" — trial-focused push for Own Brand ranges.',
+      mechanic:'Sample-size trial packs bundled at checkout for first-time OB buyers.',
+      channels:'On-site cross-sell, email/CRM, in-app banner',
+      kpi:'OB trial-to-repeat conversion',
+      risk:'Cannibalising existing branded SKU sales if positioned as a blanket discount.',
+      next:'Coordinate with Vendor Management so OB visibility doesn\u2019t crowd out supplier-funded placements.'
+    },
+    'activation|awareness': {
+      angle:'"More reasons, more savings" — surfaces the breadth of the category, not just one deal.',
+      mechanic:'Rotating daily deals across sub-categories, so the activation doubles as a mini category tour.',
+      channels:'Paid social, email/CRM, on-site banner rotation',
+      kpi:'Category page views during the campaign window',
+      risk:'Spreading attention across too many sub-categories can dilute the headline offer.',
+      next:'Cap the rotation to 3-4 flagship sub-categories before briefing the agency.'
+    },
+    'expertise|installs': {
+      angle:'"Ask a pet expert, right in the app" — positions the app as the place expertise lives.',
+      mechanic:'Expert Q&A content unlocked only inside the app, teased on web and social.',
+      channels:'App push, social teaser, email/CRM',
+      kpi:'App installs from non-app content viewers',
+      risk:'Content-first hooks convert to installs more slowly than a discount would.',
+      next:'Pair with a light install incentive so the content isn\u2019t the only reason to convert.'
+    },
+    'expertise|basket': {
+      angle:'"The right food, the right basket" — expert guidance that recommends a bundle, not a single product.',
+      mechanic:'Quiz-style content that ends in a recommended bundle (food + supplement + accessory).',
+      channels:'On-site content hub, email/CRM, in-app banner',
+      kpi:'AOV from quiz-driven baskets',
+      risk:'A clunky quiz flow adds friction instead of removing it.',
+      next:'Test the quiz-to-bundle flow with a small segment before the full campaign.'
+    },
+    'app|installs': {
+      angle:'"App-only" is the whole pitch — no ambiguity about where the value lives.',
+      mechanic:'A flagship deal or feature genuinely unavailable outside the app.',
+      channels:'App push, social, OOH driving to app store',
+      kpi:'App installs',
+      risk:'Customers feel penalised on web if the gap between app and web value is too large.',
+      next:'Confirm with Product which single feature or deal is strong enough to carry the campaign.'
+    },
+    'app|basket': {
+      angle:'"Bigger basket, app-only rewards" — ties spend thresholds to app-exclusive perks.',
+      mechanic:'Spend-based rewards (free treats, early access) redeemable only in-app.',
+      channels:'In-app banner, email/CRM, app push',
+      kpi:'AOV among app users vs. web-only users',
+      risk:'Rewards too generous erode margin on already-app-loyal customers who\u2019d have bought anyway.',
+      next:'Benchmark app-user basket size before setting reward thresholds.'
+    },
+    'app|awareness': {
+      angle:'"See what\u2019s only in the app" — built to build app curiosity, not just installs.',
+      mechanic:'A rotating preview of app-only features/content, refreshed weekly.',
+      channels:'Social, email/CRM, on-site app promotion banner',
+      kpi:'App store listing page views',
+      risk:'Awareness-only framing can under-deliver on installs without a clear next step.',
+      next:'Add a single, clear install call-to-action to every touchpoint.'
+    },
+    'ob|installs': {
+      angle:'"Try the house brand, in the app first" — uses OB trial as the app\u2019s value proposition.',
+      mechanic:'App-exclusive OB trial-size offer, not available on web at launch.',
+      channels:'App push, in-app banner, email/CRM',
+      kpi:'App installs attributed to the OB trial offer',
+      risk:'Ties two unproven ideas together — OB trial and app adoption — making it harder to diagnose what worked.',
+      next:'Run the OB trial and the app-exclusivity as separate tests before combining them.'
+    },
+    'ob|awareness': {
+      angle:'"Meet the house brand" — a straightforward introduction for shoppers who\u2019ve never tried it.',
+      mechanic:'Comparison-style content placed next to familiar branded SKUs on category pages.',
+      channels:'On-site category placement, email/CRM, social',
+      kpi:'OB category page engagement',
+      risk:'Comparison framing can look like it\u2019s undercutting supplier brands if not handled carefully.',
+      next:'Align messaging with Vendor Management before it goes live.'
+    },
+    'default': {
+      angle:'A clear, single-minded promise tailored to the campaign type and local market tone.',
+      mechanic:'A time-boxed mechanic simple enough to explain in one line of creative copy.',
+      channels:'App push, email/CRM, paid social — weighted by market',
+      kpi:'Primary KPI matched to the stated objective',
+      risk:'Losing alignment between creative, media plan and local execution mid-flight.',
+      next:'Lock the brief with all channel owners before the agency starts production.'
+    }
+  };
+
+  document.getElementById('c-go').addEventListener('click', ()=>{
+    const type = document.getElementById('c-type').value;
+    const obj = document.getElementById('c-obj').value;
+    const market = document.getElementById('c-market').value;
+    const key = type + '|' + obj;
+    const c = concepts[key] || concepts['default'];
+
+    document.getElementById('c-title').textContent = market + ' — ' + document.getElementById('c-type').selectedOptions[0].text;
+    document.getElementById('c-angle').textContent = c.angle;
+    document.getElementById('c-mechanic').textContent = c.mechanic;
+    document.getElementById('c-channels').textContent = c.channels;
+    document.getElementById('c-kpi').textContent = c.kpi;
+    document.getElementById('c-risk').textContent = c.risk;
+    document.getElementById('c-next').textContent = c.next;
+
+    const out = document.getElementById('c-out');
+    out.classList.remove('show');
+    void out.offsetWidth;
+    out.classList.add('show');
+  });
+</script>
+
+</body>
+</html>
